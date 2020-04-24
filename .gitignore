@@ -1,0 +1,6 @@
+*~
+tmp
+*.tmp
+*.txt
+*.pyc
+__pycache__

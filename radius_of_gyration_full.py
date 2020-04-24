@@ -46,10 +46,10 @@ for pos in positions:
 
 radius = np.sqrt( np.mean( np.array( distances) ) ) 
 
-print( radius )
-#print( "radius-of-gyration:", radius )
+#print( radius )
+print( "radius-of-gyration:", radius )
 
 
-#print( "cms:", cms )
+print( "cms:", cms )
 
-#print( "graphics 0 sphere {" + str(cms[0]) + " " + str(cms[1]) + " " + str(cms[2]) + "} radius " + str( radius ) + " resolution 30" )
+print( "graphics 0 sphere {" + str(cms[0]) + " " + str(cms[1]) + " " + str(cms[2]) + "} radius " + str( radius ) + " resolution 30" )

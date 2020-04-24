@@ -11,54 +11,80 @@
 import Bio.PDB
 import sys
 
-if len( sys.argv) != 8 and len( sys.argv ) != 6:
-    print "USAGE:",sys.argv[0]," ALIGN.pdb  FIRST_RESIDUE_ID  LAST_RESIDUE_ID TEMPLATE.pdb  FIRST_RESIDUE_ID  LAST_RESIDUE_ID  OUT.pdb"
-    print "OR:   ",sys.argv[0]," ALIGN.pdb  CHAIN  TEMPLATE.pdb  CHAIN  OUT.pdb"
-    print "align first PDB to the coordinates of the second, using CA atoms only"
-    print "bye"
+if len( sys.argv) < 7:
+    print "USAGE_1:",sys.argv[0]," range: ALIGN.pdb  FIRST_RESIDUE_ID  LAST_RESIDUE_ID TEMPLATE.pdb  FIRST_RESIDUE_ID  LAST_RESIDUE_ID  OUT.pdb"
+    print "USAGE_2:",sys.argv[0]," list:  ALIGN.pdb  ATOM_NAME_1:RESIDUE_ID_1:CHAIN_1 ... TEMPLATE.pdb  ATOM_NAME_1:RESIDUE_ID_1:CHAIN_1 ...  OUT.pdb"
+    print "USAGE_3:",sys.argv[0]," chain: ALIGN.pdb  CHAIN  TEMPLATE.pdb  CHAIN  OUT.pdb"
     exit(1)
 
-if len( sys.argv ) == 8:
-    first_file = sys.argv[1]    
-    id_first_start = int(sys.argv[2])
-    id_first_last = int(sys.argv[3])
+first_atoms = []
+second_atoms = []
 
+first_file = ""
+second_file = ""
+
+mode = sys.argv[1]
+
+first_ids = []
+second_ids = []
+
+if mode == "range:":
+    first_file = sys.argv[2]    
+    id_first_start = int(sys.argv[3])
+    id_first_last = int(sys.argv[4])
+
+    second_file = sys.argv[5]
+    id_second_start = int(sys.argv[6])
+    id_second_last = int(sys.argv[7])
+
+    out_file = sys.argv[8]
+
+    first_ids = range( id_first_start , id_first_last+1 )
+    second_ids = range( id_second_start , id_second_last+1 )
+
+elif mode == "chain:":
+    first_file = sys.argv[2]
+    first_chain = sys.argv[3]
     second_file = sys.argv[4]
-    id_second_start = int(sys.argv[5])
-    id_second_last = int(sys.argv[6])
+    second_chain = sys.argv[5]
+    out_file = sys.argv[6]
 
-    out_file = sys.argv[7]
+elif mode == "list:":
+    first_file = sys.argv[2]
+    index = 3
+    while ".pdb" not in sys.argv[index]:
+        first_ids.append( sys.argv[index].split(':') )
+        index += 1
 
-    first_atom_ids = range( id_first_start , id_first_last+1 )
-    second_atom_ids = range( id_second_start , id_second_last+1 )
+    second_file = sys.argv[index]
+    index += 1
+    while ".pdb" not in sys.argv[index]:
+        second_ids.append( sys.argv[index].split(':') )
+        index += 1
+    
+    out_file = sys.argv[index]
 
-elif len( sys.argv ) == 6:
-    first_file = sys.argv[1]
-    first_chain = sys.argv[2]
-    second_file = sys.argv[3]
-    second_chain = sys.argv[4]
-    out_file = sys.argv[5]
+    print( first_file, first_ids )
+    print( second_file, second_ids)
+    print( out_file )
     
 pdb_parser = Bio.PDB.PDBParser( QUIET=True )
 
 first_structure = pdb_parser.get_structure( "first", first_file )[0]
 second_structure = pdb_parser.get_structure( "second", second_file )[0]
 
-first_atoms = []
-second_atoms = []
-
-if len( sys.argv ) == 8:
+if mode == "range:":
     for chain in first_structure:
         for residue in chain:
-            if residue.get_id()[1] in first_atom_ids:
+            if residue.get_id()[1] in first_ids:
                 first_atoms.append( residue['CA'] )
 
     for chain in second_structure:
         for residue in chain:
-            if residue.get_id()[1] in second_atom_ids:
+            if residue.get_id()[1] in second_ids:
                 second_atoms.append( residue['CA'] )
 
-elif len( sys.argv ) == 6:
+elif mode == "chain:":
     #print "superimpose chains"
     #t = 0
     for chain in first_structure:
@@ -75,7 +101,21 @@ elif len( sys.argv ) == 6:
 	if chain.get_id() == second_chain:
             for	residue	in chain:
                 second_atoms.append( residue['CA'] )
-
+elif mode == "list:":
+    for chain in first_structure:
+        for residue in chain:
+            #print( chain.get_id(), residue.get_id() )
+            for ids in first_ids:
+                if chain.get_id() == ids[2] and residue.get_id()[1] == int( ids[1] ):
+                    first_atoms.append( residue[ids[0]] )
+                    print( "match", ids)
+    for chain in second_structure:
+        for residue in chain:
+            #print( chain.get_id(), residue.get_id() )
+            for ids in second_ids:
+                if chain.get_id() == ids[2] and residue.get_id()[1] == int( ids[1] ):
+                    second_atoms.append( residue[ids[0]] )
+                    print( "match", ids)
                 
 if len(second_atoms) != len(first_atoms):
     print "WARNING: number of atoms do not match!", len(first_atoms),len(second_atoms)
