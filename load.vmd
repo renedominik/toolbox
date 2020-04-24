@@ -1,0 +1,13 @@
+axes location off
+stage location off
+
+mol default color {ResType}
+mol default style {NewCartoon 0.300000 6.000000 4.100000 0}
+
+color Display Background white
+color Display FPS black
+color Axes Labels black
+
+foreach i $argv {
+  mol new $i
+} 
