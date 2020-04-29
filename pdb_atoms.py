@@ -41,7 +41,7 @@ def RMSD( first_file, second_file, chains = []):
     aligner.set_atoms( second_atoms, first_atoms )
     return aligner.rms
 
-def CMS( pdb_file, chains = [], atoms = [ 'CA' ] ):
+def CMS( pdb_file, chains = [], atoms = [ ] ):
     chain_coo = ReadChainCoordinates( pdb_file , atoms )
 
     pos = [0,0,0]
@@ -54,7 +54,7 @@ def CMS( pdb_file, chains = [], atoms = [ 'CA' ] ):
         length += len(coo)
     return pos / float(length)
 
-def MinMax( pdb_file, chains = [], atoms = [ 'CA' ] ):
+def MinMax( pdb_file, chains = [], atoms = [] ):
     chain_coo = ReadChainCoordinates( pdb_file , atoms )
 
     maxi = [-999999,-999999,-999999]
@@ -140,7 +140,7 @@ def ReadChainCoordinates( filename, atoms = [] ):
     
     with open( filename) as f:
         for l in f:
-            if l[0:4] != "ATOM": continue
+            if l[0:4] != "ATOM" and not l[0:6] == "HETATM": continue
             atom = PDBAtom( l)
             #print atom.atom_name, atom.chain
             if len(atoms) > 0 and atom.atom_name not in atoms:

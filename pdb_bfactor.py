@@ -9,6 +9,7 @@ import sys
 
 if len(sys.argv) < 3:
     print( "EXAMPLE:", sys.argv[0], "IN.pdb residues: A: 1 - 57 68 B: 5 - 122 atoms: C CA N value: 0 else: 1 OUT.pdb")
+    print( "'atoms:' keyword has to be provided, but the list can be left empty, which would lead to all atoms in the marked residues to have the 'value:' value assigned")
     exit(1)
 
 infile = sys.argv[1]
