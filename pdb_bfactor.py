@@ -9,21 +9,25 @@ import sys
 
 if len(sys.argv) < 3:
     print( "EXAMPLE:", sys.argv[0], "IN.pdb residues: A: 1 - 57 68 B: 5 - 122 atoms: C CA N value: 0 else: 1 OUT.pdb")
+    print( "'atoms:' keyword has to be provided, but the list can be left empty, which would lead to all atoms in the marked residues to have the 'value:' value assigned")
     exit(1)
 
 infile = sys.argv[1]
+if ".pdb" not in infile:
+    print( "you have to provide an input .pdb file")
+    exit(3)
 outfile = sys.argv[-1]
+if ".pdb" not in outfile:
+    outfile = "bfactor.pdb"
+    print( "OUT.pdb not correctly provided, changed to 'bfactor.pdb'")
 typ = sys.argv[2]
 
 beg = -1
 end = -1
 
-if typ == "residues:":
+if "res" in typ:
     beg = 22
     end = 26
-elif typ == "atoms:":
-    beg = 6
-    end = 11
 else:
     print( "type rubbish" )
     exit(2)
@@ -33,7 +37,7 @@ ids = []
 current = 3
 prev = -1
 chain = 'x'
-while sys.argv[current] != "atoms:":
+while "at" not in sys.argv[current]:
     if ':' in sys.argv[current]:
         chain = sys.argv[current][0]
     elif sys.argv[current] != '-':
@@ -41,12 +45,13 @@ while sys.argv[current] != "atoms:":
         prev = ids[-1]
     else:
         current += 1
-        for i in range( ids[-1] , int( sys.argv[current] ) ):
+        print( ids[-1], sys.argv[current] )
+        for i in range( ids[-1][1]+1 , int( sys.argv[current] ) + 1 ):
             ids.append( [chain, i]  )
     current += 1
 current += 1
-atoms = []
-while sys.argv[current] != "value:":
+atoms = [] 
+while "val" not in sys.argv[current]:
     atoms.append( sys.argv[current] )
     current += 1
     
@@ -67,7 +72,7 @@ with open( outfile, 'w') as w:
                 continue
             chain = l[21]
             nr = int( l[beg:end] )
-            if [chain,nr] in ids and l[12:16].strip() in atoms:
+            if [chain,nr] in ids and ( len(atoms) == 0 or l[12:16].strip() in atoms):
                 w.write( l[:60] + ("%6.2f" % value ) + l[66:] )
             else:
                 w.write( l[:60] + ("%6.2f" % other ) + l[66:] )
