@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 
 import numpy as np
 import math, sys
@@ -19,7 +19,7 @@ maxs = [float(x) for x in sys.argv[6:]]
 
 print( pose, nr, mins, maxs)
 
-pid = pose.index( ".")
+pid = pose.rfind( ".")
 head = pose[:pid]
 tail = pose[pid+1:]
 

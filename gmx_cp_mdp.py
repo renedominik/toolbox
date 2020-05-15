@@ -1,5 +1,12 @@
 #!/usr/bin/python3
 
+##################################
+##
+## copyright: Rene Staritzbichler
+##
+## absolutely no warranties
+##################################
+
 import sys
 
 filename = sys.argv[1]

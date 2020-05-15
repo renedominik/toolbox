@@ -8,8 +8,8 @@
 import sys
 
 if len(sys.argv) < 3:
-    print( "EXAMPLE:", sys.argv[0], "IN.pdb residues: A: 1 - 57 68 B: 5 - 122 atoms: C CA N value: 0 else: 1 OUT.pdb")
-    print( "'atoms:' keyword has to be provided, but the list can be left empty, which would lead to all atoms in the marked residues to have the 'value:' value assigned")
+    print( "EXAMPLE:", sys.argv[0], "IN.pdb residues: A: 1 - 57 68 B: 5 - 122  atoms: C CA N  value: 1.0  else: 0.0  OUT.pdb")
+    print( "EXAMPLE:", sys.argv[0], "IN.pdb residues: A: all  B: all  atoms: all  value: 1.0  else: 0.0  OUT.pdb")
     exit(1)
 
 infile = sys.argv[1]
@@ -41,8 +41,11 @@ while "at" not in sys.argv[current]:
     if ':' in sys.argv[current]:
         chain = sys.argv[current][0]
     elif sys.argv[current] != '-':
-        ids.append( [chain, int(sys.argv[current])] )
-        prev = ids[-1]
+        if sys.argv[current] == 'all':
+            ids.append( [chain, sys.argv[current] ] )
+        else:
+            ids.append( [chain, int(sys.argv[current])] )
+            prev = ids[-1]
     else:
         current += 1
         print( ids[-1], sys.argv[current] )
@@ -72,7 +75,7 @@ with open( outfile, 'w') as w:
                 continue
             chain = l[21]
             nr = int( l[beg:end] )
-            if [chain,nr] in ids and ( len(atoms) == 0 or l[12:16].strip() in atoms):
+            if ( [chain,nr] in ids or [chain,'all'] in ids ) and ( atoms[0] == 'all' or l[12:16].strip() in atoms):
                 w.write( l[:60] + ("%6.2f" % value ) + l[66:] )
             else:
                 w.write( l[:60] + ("%6.2f" % other ) + l[66:] )
