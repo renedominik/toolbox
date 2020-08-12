@@ -1,0 +1,42 @@
+#  vmd -e load.vmd -args *.pdb
+
+mol default color {Chain}
+#mol default color {ResType}
+mol default style {NewCartoon 0.300000 6.000000 4.100000 0}
+
+color Display Background white 
+color Display FPS black 
+color Axes Labels black
+
+axes location off
+stage location off
+
+rock off
+
+set m [transidentity]
+
+set j 0
+
+foreach i $argv {
+  mol new $i
+  molinfo $j set rotate_matrix "{ $m }"
+  incr j
+}
+
+
+render Tachyon scene_top.dat "/home/rene/dev/ext/vmd/vmd-1.9.3/lib/tachyon/tachyon_LINUXAMD64 -aasamples 12 %s -format tga -res 1024 1024 -o %s.tga"
+
+set m { {0 1 0 0} {0 0 1 0} {1 0 0 0} {0 0 0 1} }
+
+for {set j 0} {$j < $i} {incr j} {
+  molinfo $j set rotate_matrix "{ $m }"
+}
+
+render Tachyon scene_side.dat "/home/rene/dev/ext/vmd/vmd-1.9.3/lib/tachyon/tachyon_LINUXAMD64 -aasamples 12 %s -format tga -res 1024 1024 -o %s.tga"
+
+
+quit
+
+
+# call:
+# vmd -e ~/projects/peptide_gpcr/dev/vmd/render.vmd -args r_0.7A/c1__c.1.*.pdb -dispdev none

@@ -1,0 +1,9 @@
+# vmd -dispdev text -e THIS.pgn
+
+package require psfgen	 
+topology top_all27_prot_lipid.inp	 # have this located in same dir
+pdbalias residue HIS HSE                 # NOTE: CHANGE BACK
+segment R {pdb random_mutant.pdb}	 # ADJUST
+coordpdb random_mutant.pdb R	         # ADJUST
+guesscoord	 
+writepdb random_mutant_sidechains.pdb	 # OUTNAME

@@ -1,0 +1,19 @@
+#  vmd -e load.vmd -args *.pdb
+
+mol default color {Chain}
+#mol default color {ResType}
+mol default style {NewCartoon 0.300000 6.000000 4.100000 0}
+
+color Display Background white 
+color Display FPS black 
+color Axes Labels black
+
+axes location off
+stage location off
+
+#rock off
+
+foreach i $argv {
+  mol new $i
+}
+
