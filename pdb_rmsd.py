@@ -12,7 +12,7 @@ import sys
 import pdb_atoms as pdb
 
 if len( sys.argv) < 3:
-    print "USAGE:",sys.argv[0]," FIRST.pdb  SECOND.pdb  optional:CHAIN_1 (...)"
+    print "USAGE FIRST.pdb", syst.argv[0], "SECOND.pdb  optional:CHAIN_1 (...)"
     print "calc RMSD, using CA atoms only"
     print "bye"
     exit(1)

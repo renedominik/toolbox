@@ -52,7 +52,7 @@ def CMS( pdb_file, chains = [], atoms = [ ] ):
         for x in coo:
             pos += x
         length += len(coo)
-    return pos / float(length)
+    return np.array(pos) / float(length)
 
 def MinMax( pdb_file, chains = [], atoms = [] ):
     chain_coo = ReadChainCoordinates( pdb_file , atoms )
