@@ -1,5 +1,11 @@
 #!/usr/bin/python3
 
+
+#######################################
+###  COPYRIGHT: RENE STARITZBICHLER  ##
+###             12.08.2020           ##
+#######################################
+
 import sys
 import pdb_functions as pdb
 import numpy as np

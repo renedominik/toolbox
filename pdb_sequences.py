@@ -12,10 +12,12 @@ import sys
 
 filename = "/dev/null"
 if len( sys.argv) < 2:
-    print( "USAGE: ", sys.argv[0], " PDB  (optional:CHAIN) (optional:OUTFILE)  (optional:'3' for 3-letter AA code, default is 1-letter code)")
+    print( "\nUSAGE: ", sys.argv[0], " PDB  (optional:CHAIN) (optional:OUTFILE)  (optional:'3' for 3-letter AA code, default is 1-letter code)")
+    print( "\nNOTE: HETATMs are ignored!\n")
     exit(1)
 
 is_three_letter = False
+# use_hetatms = True
 chains = []
 
 for arg in sys.argv[2:]:
@@ -57,14 +59,14 @@ aa[ "Thr".upper() ] = "T"
 #    print k, v
 
 
-prev_res = "xxxx"     
+prev_res = -999999     
 prev_chain = "zzz"    
 is_first = True       
 unknown = []
 with open( sys.argv[1]) as f:
     for line in f:
 
-        if line[0:4] != "ATOM": continue
+        if line[0:4] != "ATOM" : continue
 
         resid = int( line[22:27].strip()  )
         chain = line[21]
@@ -85,11 +87,9 @@ with open( sys.argv[1]) as f:
         if resid != prev_res:
             residue = line[17:20]
             if is_three_letter:
-#                print residue,
                 out.write( residue + " " )
                 print( residue, end=' ' )
             else:
-#                print aa[residue],
                 if residue in aa:
                     out.write( aa[ residue ] )
                     print( aa[residue], end='')
