@@ -19,7 +19,7 @@ if len(sys.argv) > 2:
 
 with open( sys.argv[1]) as f:
     for l in f:
-        if l[:4] != "ATOM" or (len(chains)>0 and chain(l) not in chains):
+        if l[:4] != "ATOM" or (len(chains)>0 and pdb.chain(l) not in chains):
             continue
         pos.append( pdb.position(l) ) 
 
