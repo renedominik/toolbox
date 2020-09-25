@@ -24,9 +24,46 @@ with open( sys.argv[1]) as f:
         pos.append( pdb.position(l) ) 
 
 pos = np.array( pos)
+print( 'first pos:', pos[0])
 print( pos.shape)
 
 pca = PCA(n_components=3)
 newpos = pca.fit(pos)
 
 print( pca.components_)
+
+print( pca.explained_variance_)
+
+### test by hand implementation: ###
+print( 'first pos:', pos[0])
+
+cms = np.mean( pos, axis=0)
+print( 'cms:', cms)
+
+# standardization
+d = 0.0
+for p in pos:
+    d += np.linalg.norm( p - cms )**2
+d = np.sqrt( d / float( len(pos) - 1 ) )
+
+print( 'rgyr:', d)
+
+zpos = []
+for p in pos:
+    zpos.append( (p-cms) / d )
+zpos = np.array(zpos)
+
+print( 'first pos:', pos[0])
+
+print( zpos.shape)
+
+# covariance matrix
+cvm = np.cov( pos.T ) #.transpose() )
+
+print( cvm.shape)
+
+# solve eigen gleichung
+w,v = np.linalg.eig( cvm )
+
+print( w,'\n', v.T )
+
