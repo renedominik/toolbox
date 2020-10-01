@@ -119,17 +119,19 @@ def build_model(nn_hdim, num_passes=20000, print_loss=False):
     W2 = np.random.randn(nn_hdim, nn_output_dim) / np.sqrt(nn_hdim)
     b2 = np.zeros((1, nn_output_dim))
 
-
-    yt = one_hot(y)
-    
+    if nn_output_dim > 1:
+        yt = one_hot(y)
+    else:
+        yt = y
+        
     # This is what we return at the end
     model = {}
-#    print( 'X', X.shape)
-#    print( 'W1', W1.shape)
-#    print( 'b1', b1.shape)
-#    print( 'W2', W2.shape)
-#    print( 'b2', b2.shape)
-#    print( 'y', y.shape)
+    print( 'X', X.shape)
+    print( 'W1', W1.shape)
+    print( 'b1', b1.shape)
+    print( 'W2', W2.shape)
+    print( 'b2', b2.shape)
+    print( 'y', y.shape)
     # Gradient descent. For each batch...
     for i in range(0, num_passes):
  
@@ -142,7 +144,7 @@ def build_model(nn_hdim, num_passes=20000, print_loss=False):
         # Backpropagation
         error2 = yt - a2
         error = np.mean( np.abs( error2 ) ) 
-        delta2 = error2 * a2 * (1 - a2) # sigmoid_derivative( z2 )
+        delta2 = error2 # * a2 * (1 - a2) # sigmoid_derivative( z2 )  NOT NEEDED 
         error1 = delta2.dot( W2.T )
         delta1 = error1 * a1 * ( 1 - a1 ) # sigmoid_derivative( z1 )
 
