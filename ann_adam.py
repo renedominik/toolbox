@@ -217,4 +217,4 @@ for h in range(1,len(hidden)-1):
 z[-1] = np.dot( a[-2] , w[-1] ) + b[-1]
 a[-1] = last_layer_func( z[-1] )
 error =  np.mean( np.abs( y_test - a[-1] ))
-print( 'test loss/accuracy:',  str(round(error,5)) , str (round( (1 - error) * 100,2)) )
+print( '## test loss/accuracy:',  str(round(error,5)) , str (round( (1 - error) * 100,2)) )
