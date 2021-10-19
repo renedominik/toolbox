@@ -12,7 +12,7 @@ import sys
 import pdb_atoms as pdb
 
 if len( sys.argv) < 3:
-    print( "USAGE FIRST.pdb", syst.argv[0], "SECOND.pdb  optional:CHAIN_1 (...)" )
+    print( "USAGE", sys.argv[0], "FIRST.pdb SECOND.pdb  optional:CHAIN_1 (...)" )
     print( "calc RMSD, using CA atoms only" )
     print( "bye" )
     exit(1)
@@ -29,7 +29,7 @@ chains = []
 if len(sys.argv) > 3:
     chains = sys.argv[3:]
 
-print( "RMSD:", pdb.RMSD( first_file, second_file, chains) )
+print( "RMSD:", pdb.RMSD( first_file, second_file, chains))
 
 
 #aligner.apply( first_structure.get_atoms() )
