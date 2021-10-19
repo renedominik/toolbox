@@ -36,3 +36,27 @@ def occupancy( line):
 def bfactor( line):
     return float( line[60:66] )
 
+
+def single_letter( residue ):
+    if residue.upper() == "Gly".upper(): return "G"                                                               
+    if residue.upper() == "Ala".upper(): return "A"                                                               
+    if residue.upper() == "Leu".upper(): return "L"                                                               
+    if residue.upper() == "Met".upper(): return "M"                                                               
+    if residue.upper() == "Phe".upper(): return "F"                                                               
+    if residue.upper() == "Trp".upper(): return "W"                                                               
+    if residue.upper() == "Lys".upper(): return "K"                                                               
+    if residue.upper() == "Gln".upper(): return "Q"                                                               
+    if residue.upper() == "Glu".upper(): return "E"                                                               
+    if residue.upper() == "Ser".upper(): return "S"                                               
+    if residue.upper() == "Pro".upper(): return "P"                           
+    if residue.upper() == "Val".upper(): return "V"                           
+    if residue.upper() == "Ile".upper(): return "I"                   
+    if residue.upper() == "Cys".upper(): return "C"                
+    if residue.upper() == "Tyr".upper(): return "Y"                
+    if residue.upper() == "His".upper(): return "H"                
+    if residue.upper() == "Hsd".upper(): return "H"                
+    if residue.upper() == "Arg".upper(): return "R"                
+    if residue.upper() == "Asn".upper(): return "N"                   
+    if residue.upper() == "Asp".upper(): return "D"     
+    if residue.upper() == "Thr".upper(): return "T"   
+    return "X"

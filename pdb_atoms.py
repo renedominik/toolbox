@@ -23,20 +23,27 @@ def RMSD( first_file, second_file, chains = []):
     second_atoms = []
 
     for chain in first_structure:
-        if len(chains) > 0 and chain not in chains:
+        #print( chain.id )
+        if len(chains) > 0 and chain.id not in chains:
             continue
         for residue in chain:
-            first_atoms.append( residue['CA'] )
+            for atom in residue:
+                first_atoms.append( atom )
 
     for chain in second_structure:
-        if len(chains) > 0 and chain not in chains:
+        if len(chains) > 0 and chain.id not in chains:
             continue
         for residue in chain:
-            second_atoms.append( residue['CA'] )
+            for atom in residue:
+                second_atoms.append( atom )
 
     if len(second_atoms) != len(first_atoms):
         print( "WARNING: number of atoms do not match!", len(first_atoms),len(second_atoms) )
-            
+
+    if len(first_atoms) == 0:
+        print( "WARNING: no atoms found!")
+        return 0
+    
     aligner = Bio.PDB.Superimposer()
     aligner.set_atoms( second_atoms, first_atoms )
     return aligner.rms

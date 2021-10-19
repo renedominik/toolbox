@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 
 #######################################
@@ -9,12 +9,14 @@
 
 
 import Bio.PDB
+import Bio.AlignIO
 import sys
 
 if len( sys.argv) < 7:
-    print "USAGE_1:",sys.argv[0]," range: ALIGN.pdb  FIRST_RESIDUE_ID  LAST_RESIDUE_ID TEMPLATE.pdb  FIRST_RESIDUE_ID  LAST_RESIDUE_ID  OUT.pdb"
-    print "USAGE_2:",sys.argv[0]," list:  ALIGN.pdb  ATOM_NAME_1:RESIDUE_ID_1:CHAIN_1 ... TEMPLATE.pdb  ATOM_NAME_1:RESIDUE_ID_1:CHAIN_1 ...  OUT.pdb"
-    print "USAGE_3:",sys.argv[0]," chain: ALIGN.pdb  CHAIN  TEMPLATE.pdb  CHAIN  OUT.pdb"
+    print( "USAGE_1:",sys.argv[0]," range: ALIGN.pdb  FIRST_RESIDUE_ID  LAST_RESIDUE_ID TEMPLATE.pdb  FIRST_RESIDUE_ID  LAST_RESIDUE_ID  OUT.pdb")
+    print ( "USAGE_2:",sys.argv[0]," list:  ALIGN.pdb  ATOM_NAME_1:RESIDUE_ID_1:CHAIN_1 ... TEMPLATE.pdb  ATOM_NAME_1:RESIDUE_ID_1:CHAIN_1 ...  OUT.pdb")
+    print ( "USAGE_3:",sys.argv[0]," chain: ALIGN.pdb  CHAIN  TEMPLATE.pdb  CHAIN  OUT.pdb")
+    print ( "USAGE_3:",sys.argv[0]," alignment: ALIGN.pdb  CHAIN  TEMPLATE.pdb  CHAIN ALIGNMENT.clw  OUT.pdb")
     exit(1)
 
 first_atoms = []
@@ -49,6 +51,14 @@ elif mode == "chain:":
     second_chain = sys.argv[5]
     out_file = sys.argv[6]
 
+elif mode == "alignment:":
+    first_file = sys.argv[2]
+    first_chain = sys.argv[3]
+    second_file = sys.argv[4]
+    second_chain = sys.argv[5]
+    alignment_file = sys.argv[6]
+    out_file = sys.argv[7]
+
 elif mode == "list:":
     first_file = sys.argv[2]
     index = 3
@@ -79,10 +89,13 @@ if mode == "range:":
             if residue.get_id()[1] in first_ids:
                 first_atoms.append( residue['CA'] )
 
+    print ( "first chain, nr atoms:", len(first_atoms))
     for chain in second_structure:
         for residue in chain:
             if residue.get_id()[1] in second_ids:
+                #print residue.get_id()[1],
                 second_atoms.append( residue['CA'] )
+    print( "second chain, nr atoms:", len(second_atoms))
 
 elif mode == "chain:":
     #print "superimpose chains"
@@ -95,12 +108,43 @@ elif mode == "chain:":
         #t += c
         if chain.get_id() == first_chain:
             for residue in chain:
-                first_atoms.append( residue['CA'] )
+                if 'CA' in residue:
+                    first_atoms.append( residue['CA'] )
+                else:
+                    print( "a residue without CA?:", residue )
     #print "total:", t
     for	chain in second_structure:
-	if chain.get_id() == second_chain:
+        if chain.get_id() == second_chain:
             for	residue	in chain:
-                second_atoms.append( residue['CA'] )
+                if 'CA' in residue:
+                    second_atoms.append( residue['CA'] )
+                else:
+                    print( "a residue without CA?:", residue )
+
+elif mode == "alignment:":
+    alignment = Bio.AlignIO.read( open( alignment_file ), 'clustal')
+
+    for chain in first_structure:
+        if chain.get_id() == first_chain:
+            residues = list(chain)
+            count = 0
+            for i in range( 0, len( alignment[0].seq )):
+                if alignment[0].seq[i] != '-':
+                    if alignment[1].seq[i] != '-':
+                        #print( count, residues[count])
+                        first_atoms.append( residues[count]['CA'] )
+                    count += 1
+
+    for	chain in second_structure:
+        if chain.get_id() == second_chain:
+            residues = list(chain)
+            count = 0
+            for i in range( 0, len( alignment[1].seq )):
+                if alignment[1].seq[i] != '-':
+                    if alignment[0].seq[i] != '-':
+                        second_atoms.append( residues[count]['CA'] )
+                    count += 1
+                    
 elif mode == "list:":
     for chain in first_structure:
         for residue in chain:
@@ -118,11 +162,11 @@ elif mode == "list:":
                     print( "match", ids)
                 
 if len(second_atoms) != len(first_atoms):
-    print "WARNING: number of atoms do not match!", len(first_atoms),len(second_atoms)
+    print ("WARNING: number of atoms do not match!", len(first_atoms),len(second_atoms))
             
 aligner = Bio.PDB.Superimposer()
 aligner.set_atoms( second_atoms, first_atoms ) # place latter on former
-print "RMSD", first_file + ":", aligner.rms
+print( "RMSD", first_file + ":", aligner.rms)
 
 for chain in first_structure:
     aligner.apply( chain.get_atoms() ) # apply rotation and translation 

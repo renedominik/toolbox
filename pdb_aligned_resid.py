@@ -22,6 +22,6 @@ if len(sys.argv) > 3:
 
 pos = pdb.MatchingPositions( sys.argv[1], sys.argv[2], chains)
 
-#print pos
+print pos
 
 print pdb.MatchingPositionsRMSD( sys.argv[1], sys.argv[2], pos )
