@@ -36,7 +36,11 @@ def RMSD( first_file, second_file, chains = []):
 
     if len(second_atoms) != len(first_atoms):
         print( "WARNING: number of atoms do not match!", len(first_atoms),len(second_atoms) )
-            
+
+    if len( first_atoms) == 0:
+        #sys.stderr.write( "WARNING: empty mol " + first_file + ' ' + second_file + '\n')
+        return 0.0
+    
     aligner = Bio.PDB.Superimposer()
     aligner.set_atoms( second_atoms, first_atoms )
     return aligner.rms
@@ -46,7 +50,7 @@ def CMS( pdb_file, chains = [], atoms = [ ] ):
 
     pos = [0,0,0]
     length = 0
-    for chain,coo in chain_coo.iteritems():
+    for chain,coo in chain_coo.items():
         if len(chains) > 0 and chain not in chains:
             continue
         for x in coo:
@@ -60,7 +64,7 @@ def MinMax( pdb_file, chains = [], atoms = [] ):
     maxi = [-999999,-999999,-999999]
     mini = [999999,999999,999999]
 
-    for chain,coo in chain_coo.iteritems():
+    for chain,coo in chain_coo.items():
         if len(chains) > 0 and chain not in chains:
             continue
         for x in coo:
@@ -110,7 +114,7 @@ def MatchingPositions( first_file, second_file, chains = []):
     #print second_file, seqs2
     #print "align"
     positions = {}
-    for c,seq1 in seqs1.iteritems():
+    for c,seq1 in seqs1.items():
         #print "align", c
         seq2 = seqs2[c]
         alignment = pw.align.globalxx( seq1, seq2 )
@@ -166,7 +170,7 @@ def MatchingPositionsRMSD( first_file, second_file, pos):
 
     total = 0
     c = 0
-    for chain, positions in pos.iteritems():
+    for chain, positions in pos.items():
         rmsd = 0.0
         #print chain, len(positions)
         for p in positions:

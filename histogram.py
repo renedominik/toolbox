@@ -20,16 +20,16 @@ if len(sys.argv) < 5:
     exit(1)
 
 nr_blocks = int( (len(sys.argv) - 1) / 5)
-
+nr_blocks = 1
 outname = "hist"
 
-minx = -350
-maxx = 0.5
-deltax = 5.0
-miny = 0
-maxy = 400
+minx = 0.0
+maxx = 1.0
+deltax = 0.01
+#miny = 0
+#maxy = 400
 
-label_list = "kappa, dyn A", "kappa, dyn B", "mu, dyn B", "mu, dyn A"
+#label_list = "kappa, dyn A", "kappa, dyn B", "mu, dyn B", "mu, dyn A"
 
 print( nr_blocks, 'blocks')
 
@@ -97,22 +97,22 @@ for iii in range( 0, nr_blocks ):
     outname +=  "_" + xstr + "_" + sys.argv[iii*5+2] + sys.argv[iii*5+3]
 
     #n, bins, patches = plt.hist(x, nr, facecolor='g') #, alpha=0.75)
-    n, bins, patches = plt.hist(x, bins=np.arange(minx,maxx +0.005,deltax), alpha = 0.5, label = label_list[iii]) #, facecolor=color_list[iii], alpha=0.5)
+    n, bins, patches = plt.hist(x, bins=np.arange(minx,maxx+0.0001,deltax))#, alpha = 0.5, label = label_list[iii]) #, facecolor=color_list[iii], alpha=0.5)
     
 
-plt.legend(loc='best')
-plt.xlabel('values')
-plt.ylabel('counts')
-plt.title('Docking scores')
+#plt.legend(loc='best')
+#plt.xlabel('values')
+#plt.ylabel('counts')
+#plt.title('Docking scores')
 #plt.text(60, .025, r'$\mu=100,\ \sigma=15$')
 #plt.axis([40, 160, 0, 0.03])
-plt.xlim((minx, maxx))
+#plt.xlim((minx, maxx))
 #plt.ylim((miny, maxy))
-plt.yscale('log')
+#plt.yscale('log')
 
-plt.grid(True)
+#plt.grid(True)
 
-print( 'filename: ' , outname + '.png' )
-plt.savefig( outname + ".png" , bbox_inches='tight')
-#plt.show()
+#print( 'filename: ' , outname + '.png' )
+#plt.savefig( outname + ".png" , bbox_inches='tight')
+plt.show()
 plt.close()

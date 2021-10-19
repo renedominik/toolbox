@@ -4,6 +4,8 @@ import sys
 
 if len(sys.argv) % 3 != 0:
     print( "USAGE:", sys.argv[0], "INPDB OUTPDB RESID1 PHI1 PSI1 ... " )
+    print( "example:", sys.argv[0], "IN.pdb OUT.pdb 287 -64 -41 288 -64 -41 289 -64 -41")
+    print( "sets three residues to helical conformation" )
     exit(1)
     
 init()
