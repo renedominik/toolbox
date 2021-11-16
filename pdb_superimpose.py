@@ -132,6 +132,10 @@ elif mode == "alignment:":
                 if alignment[0].seq[i] != '-':
                     if alignment[1].seq[i] != '-':
                         #print( count, residues[count])
+                        if count >= len(residues):
+                            print( "ERROR: alignment longer than first chain: ", len(alignment[0].seq), len(residues), 'first residues: ', alignment[0].seq[:10], residues[:3])
+                        if 'CA' not in residues[count]:
+                            print( 'CA not found in residue:', residues[count])
                         first_atoms.append( residues[count]['CA'] )
                     count += 1
 

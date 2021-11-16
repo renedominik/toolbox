@@ -12,8 +12,8 @@ import pdb_functions as pdb
 import sys
 import numpy as np
 
-if len(sys.argv) < 3:
-    print "USAGE", sys.argv[0], "PDB1 PDB2"
+if len(sys.argv) < 4:
+    print "USAGE", sys.argv[0], "PDB1 PDB2 OUT.pdb"
     exit(1)
 
 mols1 = pdb.ReadPDBLines( sys.argv[1] )
