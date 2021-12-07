@@ -56,6 +56,9 @@ for chain in first_structure:
 
 for chain in second_structure:
     #print( 'second:', chain.get_id())
+    for residue in chain:
+        for atom in residue:
+            atom.set_bfactor( 0.0)
     if chain.get_id() == second_chain_id:
         #print('found')
         second_chain = list(chain)
