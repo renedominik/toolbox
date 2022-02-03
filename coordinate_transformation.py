@@ -24,3 +24,7 @@ def RelativeCoordinates( ref1, ref2, ref3, pos):
     x = np.linalg.solve( m, pos)
 
     return x
+
+
+#def Superimpose( mol1, mol2):
+    

@@ -9,20 +9,28 @@ from collections import defaultdict
 
 
 
-def correct( lines, relative , positions):
+def correct( lines, relative):
     names = []
+    positions = {}
     for l in lines:
         names.append( l[12:16].strip() )
-        print( l.strip() + ' # ')
+        positions[ names[-1] ] = position(l)
+        print( l.strip() ) # + ' # ')
     chain = lines[-1][21]
     resid = lines[-1][22:26]
     residue_name = lines[-1][17:20].strip()
     nr = -1
     missing = []
+    keys = positions.keys()
+    #print(keys)
     # find missing atoms:
     for atom_name, rel_coo in relative.items():
         if not atom_name in names:
             reference_atoms = ref_atoms[ atom_name ]
+            if reference_atoms[0] not in keys or reference_atoms[1] not in keys or reference_atoms[2] not in keys:
+                print( 'WARNING: cannot add', atom_name, ' to ', chain, resid, residue_name, ', one of these is missing:', reference_atoms)
+                continue
+            
             #print( atom_name, reference_atoms)
             rel_coo = relative[ atom_name]
             #print( rel_coo)
@@ -130,7 +138,7 @@ for l in template:
         reference_atoms = reference_heavy_atoms( atom_name, connectivity ) # find 'backbone' atoms: C, N, O? 
         relative[ atom_name] = ct.RelativeCoordinates( pos[reference_atoms[0]], pos[reference_atoms[1]], pos[reference_atoms[2]], pos[atom_name])
         ref_atoms[atom_name] = reference_atoms
-        print( '*', atom_name, reference_atoms)
+        #print( '*', atom_name, reference_atoms)
 
 
 #print( "residue ", residue_name)
@@ -143,21 +151,23 @@ residue = []
 for i in range(0, len(lines)):
     l = lines[i]
     if l[:4] != 'ATOM' and l[:6] != 'HETATM':
-        print( l.strip()  + ' - ')
+        print( l.strip() ) #  + ' - ')
         continue
     if l[17:20] != residue_name:
-        print( l.strip()  + ' + ')
+        print( l.strip() ) #  + ' + ')
         continue
     resid = int( l[22:26] )
-    if prev != -99999 and prev != resid:
-        correct( residue , relative,  pos)
+    if prev != resid:
+        if prev != -99999:
+            correct( residue , relative)
+            residue = []
         prev = resid
-        residue = []
+        #print( 'reset')
     residue.append(l)
 
     
 if len(residue) > 0:
-    correct( residue , relative, pos)
+    correct( residue , relative)
 
 
 
