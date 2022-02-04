@@ -60,3 +60,23 @@ def single_letter( residue ):
     if residue.upper() == "Asp".upper(): return "D"     
     if residue.upper() == "Thr".upper(): return "T"   
     return "X"
+
+def CooFromPDB( name, chain = ''):
+    coo = []
+    with open( name) as r:
+        for l in r:
+            if l[:4] == "ATOM" or l[:6] == 'HETATM':
+                if chain != '' and l[21] != chain: continue
+                coo.append( position(l) )
+    return np.array(coo)
+
+def WriteCooToPDB( infile, coo, outfile ):
+    with open( outfile, 'w') as w:
+        count = 0
+        with open( infile) as r:
+            for l in r:
+                if l[:4] == "ATOM" or l[:6] == 'HETATM':
+                    w.write( write_position( l, coo[count]))
+                    count += 1
+                else:
+                    w.write( l )

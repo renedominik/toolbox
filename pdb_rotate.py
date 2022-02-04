@@ -16,14 +16,14 @@ chains = []
 if len(sys.argv) > 6:
     chains = sys.argv[6:]
 
+rot = m.rotation_matrix(axis, angle)
 
 with open( sys.argv[1]) as f:
     for l in f:
         l = l.strip()
         if l[:4] == "ATOM" and (len(chains)==0 or pdb.chain(l) in chains):
-            pos =  np.dot( m.rotation_matrix(axis, angle) , pdb.position(l) )
-            l = pdb.write_position(l,pos)
-            print(l)
+            pos =  np.dot( rot , pdb.position(l) )
+            print( pdb.write_position(l,pos))
         else:
             print(l)
             
