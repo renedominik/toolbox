@@ -25,40 +25,64 @@ def Orthogonalize( pos):
     return pos
 
 
-def Insert( all_pos, residue, template_ref, template_pos, template_names, reference_atoms): 
-    if len(residue) == len(template_names[0]):
+def Insert( all_pos, residue, template_ref, template_pos, template_atoms, reference_atoms, second_structure): 
+    if len(residue) == len(template_atoms[0]):
         for l in residue:
-            print( l.strip(), '##' )
+            print( l.strip()) #, '##' )
         #print( 'complete, nothing to do')
-        return
-    
+        #sys.stdout.flush()
+        return all_pos
+    #print( "insert")
+    sys.stdout.flush()
     positions = {}
     for l in residue:
         positions[ l[12:16].strip() ] = Position(l)
-    chain = residue[0][21]
-    resid = residue[0][22:26]
+    res_chain = residue[0][21]
+    resid = int( residue[0][22:26])
     residue_name = residue[0][17:20].strip()
     nr = -1
 
-    ref_pos = []
-    ref_pos.append( positions[ reference_atoms[0] ] )
-    ref_pos.append( positions[ reference_atoms[1] ] )
-    ref_pos.append( positions[ reference_atoms[2] ] )
+    ref_atoms = []
+    for chain in second_structure:
+        if chain.get_id()  == res_chain:
+            for residue in chain:
+                #print(  residue.get_id()[1], resid )
+                #if residue.get_id()[1] == resid: 
+                #    print( 'found?:', resid, residue.get_resname() , residue_name)
+                if residue.get_resname() == residue_name and residue.get_id()[1] == resid:
+                    #print( 'found!')
+                    ref_atoms.append( residue[ reference_atoms[0] ] )
+                    ref_atoms.append( residue[ reference_atoms[1] ] )
+                    ref_atoms.append( residue[ reference_atoms[2] ] )
+                    break
+    #print( '# nr atoms in insert: ' , len(ref_atoms))
+    #sys.stdout.flush()
 
     clash = []
-    rotate = []
-    for template_ref_pos, template_all_pos in zip( template_ref, template_pos):
-        tmp, rot, cms1, cms2 = ct.Superimpose( ref_pos, template_ref_pos)
-        new_pos = ct.CooInNewRef( template_all_pos, rot, cms1, cms2)
-        clash.append( Clashes( all_pos, new_pos, 3 ) )
-        rotate.append( [rot,cms1,cms2,new_pos] )
+    aligner = Bio.PDB.Superimposer()
+    for i in range(0, len(template_atoms)):
+        aligner.set_atoms( ref_atoms, template_ref[i] ) # place latter on former
+        #print( "RMSD", aligner.rms, len(template_atoms[i]), i )
+        sys.stdout.flush()
 
-    print( '# clashes:', clash)
+        aligner.apply( template_atoms[i] )
+        count = 0
+        for atom in template_atoms[i]:
+            count += Clashes( all_pos, atom.coord , 2.5 )
+        clash.append( count )
+
+    #print( '# clashes:', clash)
+    #sys.stdout.flush()
+
     min_id = min(enumerate(clash),key=lambda x: x[1])[0]
-    #print( 'template', min_id, ' with', clash[min_id], 'clashes')
-
-    for new_pos, atom_name in zip( rotate[min_id][3], template_names[min_id]):
-        print( "HETATM{:5d} {:>4s} ".format( nr, atom_name) + residue_name + " " + chain + "{:>4s}    {:8.3f}{:8.3f}{:8.3f}".format( resid, new_pos[0], new_pos[1], new_pos[2] ) + "  1.00  0.0            H **")
+    aligner.set_atoms( ref_atoms, template_ref[min_id] )
+    aligner.apply( template_atoms[min_id] )
+    for atom in template_atoms[min_id]:
+        new_pos = atom.coord
+        all_pos.append(new_pos)
+        atom_name = atom.name
+        print( "HETATM{:5d} {:>4s} ".format( nr, atom_name) + residue_name + " " + res_chain + "{:>4d}    {:8.3f}{:8.3f}{:8.3f}".format( resid, new_pos[0], new_pos[1], new_pos[2] ) + "  1.00  0.0                ")
+    return all_pos
 
 
             
@@ -71,8 +95,14 @@ def PositionMap( lines ):
         diggi[l[12:16].strip() + ':' + l[21] + ':' + l[22:26].strip() ] = Position(l)
     return diggi
 
+
+def Clashes( all_pos, pos, threshold ):
+    all_pos -= pos
+    d = np.linalg.norm( all_pos, axis=1)
+    return sum( x < threshold for x in d)
+
    
-def Clashes( all_posx, pos, threshold ):
+def Clashesxxx( all_posx, pos, threshold ):
     count = 0
     for p in all_posx:
         d = np.linalg.norm( p - pos )
@@ -108,53 +138,48 @@ if resname == "GBF":
     reference_atoms = [ 'C2A', 'CHD', 'C4B' ]       # atoms from ring structure, defining coordinate system
 #reference_atoms = sys.argv[3:]
 
-print( 'reference atoms:', reference_atoms)
+print( 'REMARK cofactor:', resname)
+print( 'REMARK reference atoms:', reference_atoms)
 
 pdb_parser = Bio.PDB.PDBParser( QUIET=True )
 first_structure = pdb_parser.get_structure( "first", sys.argv[1] )[0]
 second_structure = pdb_parser.get_structure( "second", sys.argv[2] )[0]
 
 
-with open( sys.argv[1] ) as r:
-    template_lines = r.readlines()
-    
-pos_map = PositionMap( template_lines) # key: atom name + ':' + l[21] + ':' + l[22:26].strip()
-
 template_ref = []
 template_pos = []
 template_names = []
-residue_pos = []
-atom_names = []
+template_atoms = []
 
 prev = -99999
-for l in template_lines:
-    atom_name = l[12:16].strip()
-    residue_name = l[17:20]
-    resid = int(l[22:26])
-    if residue_name == resname:
-        if resid != prev:
-            ending = ':' + l[21] + ':' + l[22:26].strip()
-            ref_pos = []
-            ref_pos.append( pos_map[reference_atoms[0] + ending ])
-            ref_pos.append( pos_map[reference_atoms[1] + ending ])
-            ref_pos.append( pos_map[reference_atoms[2] + ending ])
-            template_ref.append( ref_pos )
-            prev = resid            
-            if len(residue_pos) > 0:
-                template_pos.append( residue_pos)
-                template_names.append( atom_names)
-                residue_pos = []
-                atom_names = []
-        residue_pos.append( Position(l) )
-        atom_names.append( atom_name )
-                            
-if len(residue_pos) > 0:
-    template_pos.append( residue_pos)
-    template_names.append( atom_names)
+for chain in first_structure:
+    for residue in chain:
 
+        residue_name = residue.get_resname()
 
-print( "residue ", residue_name)
-print( len(template_names), 'templates')
+        ref_atoms = []
+        ref_atoms.append( residue[reference_atoms[0]] )
+        ref_atoms.append( residue[reference_atoms[1]] )
+        ref_atoms.append( residue[reference_atoms[2]] )
+        template_ref.append( ref_atoms )
+
+        residue_pos = []
+        atom_names = []
+        atoms = []
+        for atom in residue:
+            residue_pos.append( atom.coord )
+            atom_names.append( atom.name )
+            atoms.append( atom)
+        template_pos.append( residue_pos)
+        template_names.append( atom_names)
+        template_atoms.append( atoms )
+
+if resname != residue_name:
+    print( 'ERROR residue names do not match: ', resname, residue_name)
+    exit(1)
+    
+#print( "# residue ", residue_name)
+#print( len(template_names), 'templates')
 
 with open( sys.argv[2] ) as r:
     lines = r.readlines()
@@ -164,22 +189,25 @@ for l in lines:
     if l[:4] != 'ATOM' and l[:6] != 'HETATM':
         continue
     all_pos.append( Position(l))
-print( '# pos:', len(all_pos))
+#print( '# pos:', len(all_pos))
 
 prev = -99999
 residue = []
 for i in range(0, len(lines)):
     l = lines[i]
     if l[:4] != 'ATOM' and l[:6] != 'HETATM':
-        print( l.strip()   + ' - ')
+        print( l.strip()) #   + ' - ')
         continue
     if l[17:20] != residue_name:
-        print( l.strip()   + ' + ')
+        print( l.strip() ) #  + ' + ')
         continue
     resid = int( l[22:26] )
     if prev != resid:
         if len(residue) > 0:
-            Insert( all_pos, residue , template_ref, template_pos, template_names, reference_atoms)
+            #print( 'before insert all pos: ', len(all_pos))
+            all_pos = Insert( all_pos, residue , template_ref, template_pos, template_atoms, reference_atoms, second_structure)
+            #print( 'after insert all pos: ', len(all_pos))
+            sys.stdout.flush()
             residue = []
         prev = resid
         #print( 'reset')
@@ -187,8 +215,7 @@ for i in range(0, len(lines)):
 
     
 if len(residue) > 0:
-    Insert( all_pos, residue , template_ref, template_pos, template_names, reference_atoms)
-
+    Insert( all_pos, residue , template_ref, template_pos, template_atoms, reference_atoms, second_structure)
 
 
 
