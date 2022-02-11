@@ -34,6 +34,10 @@ def sym(w):
     from scipy.linalg import sqrtm, inv
     return w.dot(inv(sqrtm(w.T.dot(w))))
 
+def OrthogonalizeRows( m, row = 2):
+    m[ row%3 ] = np.cross( m[ (row+1)%3 ] , m[ (row+2)%3 ] )
+    return m
+
 def Superimpose( mol1, mol2):
     #print( mol1[0] )
     #print( mol2[0] )
@@ -70,7 +74,7 @@ def Superimpose( mol1, mol2):
         eigenvalues[0],eigenvalues[1] = eigenvalues[1],eigenvalues[0]
         #print( 'swap01b:', eigenvalues)
 
-    eigenvectors = sym( eigenvectors)
+    eigenvectors = OrthogonalizeRows( eigenvectors)
     rot = eigenvectors.dot( m )
 
     for i in range( 0, 2):
@@ -78,7 +82,8 @@ def Superimpose( mol1, mol2):
         for j in range( 0, 3):
             rot[i][j] *= t
 
-    rot = sym( rot )
+#    rot = OrthogonalizeRows( rot ) # critical step, might fail
+    rot = sym( rot ) # critical step, might fail
     rot = rot.transpose().dot( eigenvectors)
     #print( rot.shape )
     #print( mol2.shape)
@@ -89,5 +94,11 @@ def Superimpose( mol1, mol2):
     #print( 'superimposed')
     #print( mol2[0] )
     #print( mol2.shape)
-    return mol2
-    
+#    return mol2, rot
+    return mol2, rot, cms1, cms2
+
+def CooInNewRef( pos, rot, cms1, cms2):
+    pos -= cms2
+    rot.dot( pos.transpose()).transpose()
+    pos += cms1
+    return pos
