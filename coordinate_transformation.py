@@ -18,11 +18,8 @@ def RelativeCoordinates( ref1, ref2, ref3, pos):
     v2 = ref2 - ref3
     v3 = np.cross( v1, v2)
     m = np.array( [ v1, v2, v3 ] ).transpose()
-
     pos -= ref2
-
     x = np.linalg.solve( m, pos)
-
     return x
 
 def CMS( pos ):
@@ -38,8 +35,8 @@ def sym(w):
     return w.dot(inv(sqrtm(w.T.dot(w))))
 
 def Superimpose( mol1, mol2):
-    print( mol1[0] )
-    print( mol2[0] )
+    #print( mol1[0] )
+    #print( mol2[0] )
     cms1 = CMS( mol1)
     cms2 = CMS( mol2)
     #print( 'cms')
@@ -89,8 +86,8 @@ def Superimpose( mol1, mol2):
 
     mol2 = rot.dot( mol2.transpose()).transpose()
     mol2 += cms1
-    print( 'superimposed')
-    print( mol2[0] )
+    #print( 'superimposed')
+    #print( mol2[0] )
     #print( mol2.shape)
     return mol2
     
