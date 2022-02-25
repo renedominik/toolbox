@@ -3,11 +3,11 @@
 import sys
 
 atnr = 1
-resnr = -99
+resnr = -99999
 prev_chain = '9'
-prev_res_id = -999
+prev_res_id = -99999
 prev_res_name = 'XYZ'
-newchain = False
+#newchain = False
 
 with open( sys.argv[1] ) as f:
     for l in f:

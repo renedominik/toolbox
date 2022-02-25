@@ -13,22 +13,22 @@ def correct( lines, relative):
     names = []
     positions = {}
     for l in lines:
-        names.append( l[12:16].strip() )
-        positions[ names[-1] ] = position(l)
+        name =  l[12:16].strip()
+        names.append( name )
+        positions[ name ] = position(l)
         print( l.strip() ) # + ' # ')
     chain = lines[-1][21]
     resid = lines[-1][22:26]
     residue_name = lines[-1][17:20].strip()
     nr = -1
     missing = []
-    keys = positions.keys()
-    #print(keys)
+    #print(names)
     # find missing atoms:
     for atom_name, rel_coo in relative.items():
         if not atom_name in names:
             reference_atoms = ref_atoms[ atom_name ]
-            if reference_atoms[0] not in keys or reference_atoms[1] not in keys or reference_atoms[2] not in keys:
-                print( 'WARNING: cannot add', atom_name, ' to ', chain, resid, residue_name, ', one of these is missing:', reference_atoms)
+            if reference_atoms[0] not in names or reference_atoms[1] not in names or reference_atoms[2] not in names:
+                #print( 'WARNING: cannot add', atom_name, ' to ', chain, resid, residue_name, ', one of these is missing:', reference_atoms)
                 continue
             
             #print( atom_name, reference_atoms)
@@ -107,7 +107,7 @@ def reference_heavy_atoms( name, connect):
 
 if len(sys.argv) < 3:
     #print( 'USAGE', sys.argv[0], 'template.pdb model.pdb TYPE1 TYPE2 TYPE3 (CHAIN:default "A")' )
-    print( 'USAGE', sys.argv[0], 'template.pdb model.pdb (CHAIN:default "A")' )
+    print( 'USAGE', sys.argv[0], 'template.pdb model.pdb' )
     print( 'reads template and checks model and adds missing hydrogens to identical residues')
     print( 'TYPEi defines the atom names used for defining the reference coordinate system')
     exit(1)
@@ -117,10 +117,6 @@ if len(sys.argv) < 3:
 #reference_atoms = sys.argv[3:]
 #print( reference_atoms)
 
-chain = 'A'
-if len( sys.argv) > 3:
-    chain = sys.argv[3]
-    
 with open( sys.argv[1] ) as r:
     template = r.readlines()
 
@@ -150,15 +146,15 @@ prev = -99999
 residue = []
 for i in range(0, len(lines)):
     l = lines[i]
-    if l[:4] != 'ATOM' and l[:6] != 'HETATM':
-        print( l.strip() ) #  + ' - ')
-        continue
-    if l[17:20] != residue_name:
+    if l[17:20] != residue_name or (l[:4] != 'ATOM' and l[:6] != 'HETATM'):
+        if len(residue) > 0:
+            correct( residue , relative)
+            residue = []
         print( l.strip() ) #  + ' + ')
         continue
     resid = int( l[22:26] )
     if prev != resid:
-        if prev != -99999:
+        if len( residue) > 0:
             correct( residue , relative)
             residue = []
         prev = resid

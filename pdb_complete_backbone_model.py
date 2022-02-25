@@ -81,7 +81,7 @@ def Insert( all_pos, residue, template_ref, template_pos, template_atoms, refere
         new_pos = atom.coord
         all_pos.append(new_pos)
         atom_name = atom.name
-        print( "HETATM{:5d} {:>4s} ".format( nr, atom_name) + residue_name + " " + res_chain + "{:>4d}    {:8.3f}{:8.3f}{:8.3f}".format( resid, new_pos[0], new_pos[1], new_pos[2] ) + "  1.00  0.0                ")
+        print( "HETATM{:5d} {:>4s} ".format( nr, atom_name) + residue_name + " " + res_chain + "{:>4d}    {:8.3f}{:8.3f}{:8.3f}".format( resid, new_pos[0], new_pos[1], new_pos[2] ) + "{:6.2f}  0.0                ".format( clash[min_id]))
     return all_pos
 
 
@@ -99,7 +99,7 @@ def PositionMap( lines ):
 def Clashes( all_pos, pos, threshold ):
     all_pos -= pos
     d = np.linalg.norm( all_pos, axis=1)
-    return sum( x < threshold for x in d)
+    return sum( x < threshold for x in d) # returns number of atom contacts below threshold
 
    
 def Clashesxxx( all_posx, pos, threshold ):
