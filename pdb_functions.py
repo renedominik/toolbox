@@ -66,6 +66,7 @@ def CooFromPDB( name, chain = ''):
     with open( name) as r:
         for l in r:
             if l[:4] == "ATOM" or l[:6] == 'HETATM':
+                #if (chain != '' and l[21] != chain) or l[12:16].strip() != 'CA': continue
                 if chain != '' and l[21] != chain: continue
                 coo.append( position(l) )
     return np.array(coo)
