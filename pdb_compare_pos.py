@@ -36,7 +36,7 @@ m = np.array( m)
 
 print( m)
 
-print( len(first), len(second) )
+print( m.shape )
 
 minima = np.argmin( m, axis=1)
 #print( minima)
