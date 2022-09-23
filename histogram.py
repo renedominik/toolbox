@@ -96,8 +96,8 @@ for iii in range( 0, nr_blocks ):
         xstr = xstr[:xid]
     outname +=  "_" + xstr + "_" + sys.argv[iii*5+2] + sys.argv[iii*5+3]
 
-    #n, bins, patches = plt.hist(x, nr, facecolor='g') #, alpha=0.75)
-    n, bins, patches = plt.hist(x, bins=np.arange(minx,maxx+0.0001,deltax))#, alpha = 0.5, label = label_list[iii]) #, facecolor=color_list[iii], alpha=0.5)
+    n, bins, patches = plt.hist(x, nr, facecolor='g', alpha=0.75)
+    #n, bins, patches = plt.hist(x, bins=np.arange(minx,maxx+0.0001,deltax))#, alpha = 0.5, label = label_list[iii]) #, facecolor=color_list[iii], alpha=0.5)
     
 
 #plt.legend(loc='best')
