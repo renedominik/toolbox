@@ -38,7 +38,7 @@ then
     echo "backup xtc files to cluster home" >> /home/hildilab/dev/scripts/status.log
     #su -c 'rsync -auPW --include '*/' --include '*.xtc' --exclude '*' projects renedominik@172.18.212.3:.  --log-file log.txt' hildilab
     #su -c 'rsync -auPW --include '*/'  --exclude '*' --include '*.xtc' projects renedominik@172.18.212.3:.  --log-file log.txt' hildilab
-    su -c 'rsync -auPW --include \*/  --exclude \* --include \*.xtc projects renedominik@172.18.212.3:.' hildilab
+    su -c 'rsync -auPW --include \*/  --include \*.xtc --exclude \*  projects renedominik@172.18.212.3:.' hildilab
     
     echo  >> /home/hildilab/dev/scripts/status.log
     echo "****  backup home rene happiness  ****" 
