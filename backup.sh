@@ -55,4 +55,13 @@ then
     echo "backup home hildilab happiness" >> /home/hildilab/dev/scripts/status.log
     su -c 'rsync -auPW  --exclude=blast --exclude=snap --exclude=.cache --exclude=.config --exclude=.local --exclude=.mozilla  --exclude=\*~ --exclude .git  /home/hildilab $target --log-file log.txt' hildilab
     echo
+
+    echo  >> /home/hildilab/dev/scripts/status.log
+    echo "****  backup home spectrum happiness  ****"
+    echo "backup home spectrum happiness" >> /home/hildilab/dev/scripts/status.log
+    rsync -auPW  --exclude=.local --exclude=snap --exclude=.cache --exclude=.config --exclude=.nv --exclude=.mozilla  --exclude=\*~ --exclude .git  --exclude Music --exclude Documents --exclude Downloads --exclude Desktop --exclude Templates --exclude Videos --exclude Pictures  /home/spectrum $target --log-file log.txt
+    echo
+
+
+
 fi
