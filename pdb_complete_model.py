@@ -117,8 +117,11 @@ if len(sys.argv) < 3:
 #reference_atoms = sys.argv[3:]
 #print( reference_atoms)
 
+template = []
 with open( sys.argv[1] ) as r:
-    template = r.readlines()
+    for l in r:
+        if l[:4] == 'ATOM' or l[:6] == "HETATM":
+            template.append(l.strip())
 
 pos = position_map( template)
 connectivity = connectivity_map( template) 
